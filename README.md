@@ -65,8 +65,8 @@ Se for enviar PR:
 4. Abra o PR descrevendo as mudanças.
 
 ## Recursos
-- Canal Bro Code no YouTube: https://www.youtube.com/@BroCode  
-- Curso completo de C++ (pesquisa do curso do Bro Code): https://www.youtube.com/results?search_query=Bro+Code+C%2B%2B+full+course
+- Canal Bro Code no YouTube: https://www.youtube.com/@BroCodez
+- Curso completo de C++ do Bro Code: https://www.youtube.com/watch?v=-TkoO8Z07hI&t=3161s
 
 ## Contato
 GitHub: https://github.com/Vinicius-fa
