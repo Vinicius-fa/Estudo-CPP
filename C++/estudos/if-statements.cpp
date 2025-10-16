@@ -20,7 +20,7 @@ int main() {
 
     if (idade >= 18) {
         std::cout << "Vai ter que pagar conta kkkkk" << std::endl; 
-    } else if (idade >= 100) { // Usado caso a condição anterior for falsa e executa outro bloco de código
+    } else if (idade > 100) { // Usado caso a condição anterior for falsa e executa outro bloco de código
         std::cout << "Se usa bengala kkkkkkkkkkkkkk" << std::endl;
     } else if (idade <= 0) {
         std::cout << "Você nem nasceu ainda zé kkkk" << std::endl; 
