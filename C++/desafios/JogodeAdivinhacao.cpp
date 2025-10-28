@@ -1,8 +1,8 @@
 //jogo de adivinhação em cpp
 
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+#include <cstdlib> // para funções de geração de números aleatórios
+#include <ctime> // para inicializar o gerador de números aleatórios com o tempo atual
 
 int main() {
     std::srand(std::time(0)); // inicializa o gerador de numeros aleatorios com a hora atual

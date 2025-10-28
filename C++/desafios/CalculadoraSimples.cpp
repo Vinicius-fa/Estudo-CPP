@@ -16,20 +16,29 @@ int main() {
 
     double resultado;
 
-    if (operacao == '+') {
-        resultado = num1 + num2;
-        std::cout << "A soma dos numeros é : " << resultado << std::endl;
-    } else if (operacao == '-') {
-        resultado = num1 - num2;
-        std::cout << "A subtração dos numeros é: " << resultado << std::endl;
-    } else if (operacao == '/') {
-        resultado = num1 / num2;
-        std::cout << "A divisão dos numeros é: " << resultado << std::endl;
-    } else if (operacao == '*') {
-        resultado = num1 * num2;
-        std::cout << "A multiplicação dos numeros é: " << resultado << std::endl;
-    } else {
-        std::cout << "Dados invalidos inseridos" << std::endl;
+    switch (operacao) {
+        case '+':
+            resultado = num1 + num2;
+            break;
+        case '-':
+            resultado = num1 - num2;
+            break;
+        case '*':
+            resultado = num1 * num2;
+            break;
+        case '/':
+            if (num2 != 0) {
+                resultado = num1 / num2;
+            } else {
+                std::cout << "Erro: Divisao por zero nao e permitida." << std::endl;
+                return 1; // Sai do programa com codigo de erro
+            }
+            
+            break;
+
+        default:
+            std::cout << "Operacao invalida. Por favor, use +, -, * ou /." << std::endl;
+            return 1; // Sai do programa com codigo de erro
     }
 
     /*nota:
