@@ -7,7 +7,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
-
+#include <random>
 
 struct Sensor {
     std::string name;
@@ -21,7 +21,7 @@ struct Sensor {
     int readingCount;
 };
 
-std::string getStatus(Sensor s) {
+std::string getStatus(const Sensor& s) {
     if(s.value >= s.criticalThreshold) {
         return "CRITICAL";
     } else if (s.value >= s.warningThreshold) {
@@ -54,33 +54,39 @@ std::vector<Sensor> loadSensors(const std::string& filename) {
 
         if (fields.size() < 5) continue;
 
-        std::string name  = fields[0];
-        double value      = std::stod(fields[1]);
-        double warning    = std::stod(fields[2]);
-        double critical   = std::stod(fields[3]);
-        std::string unit  = fields[4];
+        try {
+            std::string name  = fields[0];
+            double value      = std::stod(fields[1]);
+            double warning    = std::stod(fields[2]);
+            double critical   = std::stod(fields[3]);
+            std::string unit  = fields[4];
 
-        sensors.push_back({name, value, warning, critical, unit, value, value, value, 1});
+            sensors.push_back({name, value, warning, critical, unit, value, value, value, 1});
+        } catch (const std::exception& e) {
+            std::cerr << "Erro ao converter dados numéricos na linha: " << line << "\n";
+            continue;
+        }
     }
 
     file.close();
     return sensors;
 }
 
-void logAlert(Sensor& s) {
+void logAlert(const Sensor& s, std::ofstream& logFile) {
     time_t now = time(0);
     char timestamp[20];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
-    std::ofstream logFile("alerts.log", std::ios::app);
-    logFile << "[" << timestamp << "] " << getStatus(s) << " - " << s.name << ": " << s.value << " " << s.unit << "\n";
-    logFile.close();
-
+    if (logFile.is_open()) {
+        logFile << "[" << timestamp << "] " << getStatus(s) << " - " << s.name << ": " << s.value << " " << s.unit << "\n";
+    }
 }
 
 int main() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(-5.0, 5.0);
 
-    srand(time(0));
 
     std::vector<Sensor> sensors = loadSensors("sensors.csv");
 
@@ -89,22 +95,32 @@ int main() {
         return 1;
     }
 
+    std::ofstream logFile("alerts.log", std::ios::app);
+    if (!logFile.is_open()) {
+        std::cerr << "Falha ao abrir arquivo de log de alertas.\n";
+    }
+
     std::cout << "System Monitor Starting..." << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
     while (true) {
 
-        system("cls");
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+
 
         for (Sensor& s : sensors) {
-            s.value += (rand() %100 - 50) / 10.0;
+            s.value += dis(gen);
             if (s.value < s.minValue) s.minValue = s.value;
             if (s.value > s.maxValue) s.maxValue = s.value;
             s.totalValue += s.value;
             s.readingCount++;
         }
 
-        for (Sensor s : sensors) {
+        for (const Sensor& s : sensors) {
             std::cout << s.name << " | " << s.value << " " << s.unit
                       << " | " << getStatus(s) 
                       << " | min: " << s.minValue
@@ -112,11 +128,15 @@ int main() {
                       << " avg: " << s.totalValue / s.readingCount << "\n";
 
             if (getStatus(s) != "OK") {
-                logAlert(s);
+                logAlert(s, logFile);
             }
         }
+        
+        logFile.flush();
+
         std::cout << "--- refresh ---\n" << std::flush;
         std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     }
+
     return 0;
 }
